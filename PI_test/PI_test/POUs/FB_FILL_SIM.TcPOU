@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="FB_FILL_SIM" Id="{10504720-b83b-4f1b-8a54-e9c91cc4c4db}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FILL_SIM
+VAR_INPUT
+	rVesselSize: LREAL;
+	rFillingRate: LREAL;
+	rValveInOpening: LREAL;
+	rEmptyingRate: LREAL;
+	rValveOutOpening: LREAL;
+	bReset: BOOL;
+END_VAR
+VAR_OUTPUT
+	rVesselLevel: LREAL;
+	rVesselLevelPercentage: LREAL;
+END_VAR
+VAR
+	rActualFillingRate: LREAL;
+	bValveInOpen: BOOL;
+	tonTimer1: TON;
+	tonTimer2: TON;
+	rTrig: R_TRIG;
+	bValveOutOpen: BOOL;
+	rActualEmptyingRate: LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[bValveInOpen := rValveInOpening > 0;
+bValveOutOpen := rValveOutOpening > 0;
+
+rActualFillingRate := rFillingRate*rValveInOpening/100;
+rActualEmptyingRate := rEmptyingRate*rValveOutOpening/100;
+
+tonTimer1(IN:=NOT tonTimer2.Q, PT:=T#50MS);
+tonTimer2(IN:=tonTimer1.Q, PT:=T#50MS);
+rTrig(CLK:=tonTimer1.Q);
+
+IF rTrig.Q THEN
+	IF bValveInOpen THEN
+		rVesselLevel := rVesselLevel + rActualFillingRate/60000*100;
+	END_IF
+	IF bValveOutOpen THEN
+		rVesselLevel := rVesselLevel - rActualEmptyingRate/60000*100;
+	END_IF
+END_IF
+
+IF bReset THEN
+	rVesselLevel := 0;
+END_IF
+
+rVesselLevelPercentage := rVesselLevel/rVesselSize * 100;
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_FILL_SIM">
+      <LineId Id="10" Count="23" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <DUT Name="TYP_VESSEL" Id="{71f382a8-2097-4498-95c4-56874a8f5145}">
+    <Declaration><![CDATA[TYPE TYP_VESSEL :
+STRUCT
+	rVesselSize: LREAL := 100;
+	rFillingRate: LREAL := 100;
+	rValveInOpening: LREAL := 50;
+	rEmptyingRate: LREAL := 100;
+	rValveOutOpening: LREAL := 50;
+	rSetPoint: LREAL := 50;
+	bReset: BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

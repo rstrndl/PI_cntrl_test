@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.12">
+  <POU Name="MAIN" Id="{5b0cee5d-8936-4015-a5dc-b49173cf859a}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	fbVesselSim: FB_FILL_SIM;
+	fbPIControl: FB_CTRL_PI;
+	stParameters: ST_CTRL_PI_PARAMS;
+	gVessel: TYP_VESSEL;
+	bChangeDefaultPi: BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF NOT bChangeDefaultPi THEN
+	stParameters.bARWOnIPartOnly:=FALSE;
+	stParameters.fKp:=200; 
+	stParameters.fOutMaxLimit:=100; 
+	stParameters.fOutMinLimit:=0; 
+	stParameters.tCtrlCycleTime:=T#100MS;
+	stParameters.tTaskCycleTime:=T#100MS; 
+	stParameters.tTn:=T#2M;
+END_IF
+
+fbVesselSim(rFillingRate:=gVessel.rFillingRate, 
+			rVesselSize:=gVessel.rVesselSize, 
+			rValveInOpening:=fbPIControl.fOut, 
+			rEmptyingRate:=gVessel.rEmptyingRate, 
+			rValveOutOpening:=gVessel.rValveOutOpening, 
+			bReset:=gVessel.bReset);
+
+fbPIControl(fSetpointValue:=gVessel.rSetPoint,
+			fActualValue:=fbVesselSim.rVesselLevel,
+			eMode:=2,
+			fManSyncValue := 50,
+			bSync:=FALSE,
+			bHold:=FALSE,
+			stParams:=stParameters);			]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="63" Count="0" />
+      <LineId Id="69" Count="6" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="13" Count="4" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="25" Count="4" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
